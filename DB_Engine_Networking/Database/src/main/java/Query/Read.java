@@ -82,6 +82,11 @@ public class Read {
         return "ERROR - SQL EXCEPTION";
     }
 
+    /**
+     * Gets the author's avatar hash
+     * @param discord_id the author's discord ID
+     * @return avatar hash, or an error message
+     */
     public String avatarHash(long discord_id) {
         try(PreparedStatement statement = connection.prepareStatement(
                 "SELECT avatar_hash\n" +
@@ -102,6 +107,63 @@ public class Read {
         }
         //if there was an exception
         return "ERROR - SQL EXCEPTION";
+    }
+
+
+    /**
+     * Gets the given author's username
+     * @param discord_id the author's discord ID
+     * @return author's username, or appropriate error message
+     */
+    public String username(long discord_id) {
+        try(PreparedStatement statement = connection.prepareStatement(
+                "SELECT username\n" +
+                        "\t\t\tFROM authors\n" +
+                        "\t\t\tWHERE discord_id = ?"
+        )){
+            statement.setLong(1, discord_id);
+
+            ResultSet resultSet = execute(statement);
+
+            //if the resultSet is empty
+            if (!resultSet.next()) return "ERROR - RESULT SET EMPTY";
+
+            if (database.isQueryVisible()) System.out.println("\t\t" + resultSet.getString(1));
+
+            return resultSet.getString(1);
+        } catch(SQLException e){
+            System.out.println(e.getMessage());
+        }
+        //if there's an exception
+        return "ERROR - SQL EXCEPTION";
+    }
+
+    /**
+     * Gets the 4-digit discriminator for the given author
+     * @param discord_id the discord ID of the author
+     * @return discriminator, or -1 if there are no results, -2 for an sql exception
+     */
+    public int discriminator(long discord_id) {
+        try(PreparedStatement statement = connection.prepareStatement(
+                "SELECT discriminator\n" +
+                        "\t\t\tFROM authors\n" +
+                        "\t\t\tWHERE discord_id = ?"
+        )){
+            statement.setLong(1, discord_id);
+
+            ResultSet resultSet = execute(statement);
+
+            //if the resultSet is empty
+            if (!resultSet.next()) return -1;
+
+            if (database.isQueryVisible()) System.out.println("\t\t" + resultSet.getString(1));
+
+            return resultSet.getInt(1);
+        } catch(SQLException e){
+            System.out.println(e.getMessage());
+        }
+        //if there's an exception
+        return -2;
     }
 
     /**

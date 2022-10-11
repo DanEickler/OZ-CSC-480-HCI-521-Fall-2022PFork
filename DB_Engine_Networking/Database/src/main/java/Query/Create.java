@@ -40,7 +40,8 @@ public class Create {
      * @param content                          The content of the message
      * @param updated_at                       The time the message was edited.
      */
-    public void message(long discord_id, long authors_discord_id, long channels_text_channel_discord_id, String content, long updated_at) {
+    public void message(long discord_id, long authors_discord_id, long channels_text_channel_discord_id, String content,
+                        long updated_at) {
         //trim to size if necessary (it shouldn't be necessary)
         if (content.length() > Database.MESSAGE_LIMIT) content = content.trim().substring(0, Database.MESSAGE_LIMIT);
 
@@ -64,21 +65,27 @@ public class Create {
     /**
      * Adds a new author to the Authors table
      *
-     * @param discord_id The Discord ID of the author being added
-     * @param nickname   The Nickname of the author being added
+     * @param discord_id    The Discord ID of the author being added
+     * @param nickname      The Nickname of the author being added
+     * @param username      The username of the author being added
+     * @param discriminator The 4-digit discriminator of the author being added
      */
-    public void author(long discord_id, String nickname) {
+    public void author(long discord_id, String nickname, String username, int discriminator) {
         //trim to size if necessary
         if (nickname.length() > Database.NICKNAME_LIMIT)
             nickname = nickname.trim().substring(0, Database.NICKNAME_LIMIT);
+        if(username.length() > Database.USERNAME_LIMIT)
+            username = username.trim().substring(0, Database.USERNAME_LIMIT);
 
         //prepare the SQL statement
         try(PreparedStatement statement = connection.prepareStatement(
                 "INSERT INTO authors\n" +
-                        "\t\t\tVALUES(?, ?, NULL)"
+                        "\t\t\tVALUES(?, ?, NULL, ?, ?)"
         )) {
             statement.setLong(1, discord_id);
             statement.setString(2, nickname);
+            statement.setString(3, username);
+            statement.setInt(4, discriminator);
 
             execute(statement);
         }catch(SQLException e){
@@ -92,8 +99,10 @@ public class Create {
      * @param discord_id The Discord ID of the author being added
      * @param nickname   The Nickname of the author being added
      * @param avatar_hash The optional hash of the author's avatar
+     * @param username      The username of the author being added
+     * @param discriminator The 4-digit discriminator of the username for the author
      */
-    public void author(long discord_id, String nickname, String avatar_hash) {
+    public void author(long discord_id, String nickname, String avatar_hash, String username, int discriminator) {
         //trim to size if necessary
         if (nickname.length() > Database.NICKNAME_LIMIT)
             nickname = nickname.trim().substring(0, Database.NICKNAME_LIMIT);
@@ -101,11 +110,13 @@ public class Create {
         //prepare the SQL statement
         try(PreparedStatement statement = connection.prepareStatement(
                 "INSERT INTO authors\n" +
-                        "\t\t\tVALUES(?, ?, ?)"
+                        "\t\t\tVALUES(?, ?, ?, ?, ?)"
         )) {
             statement.setLong(1, discord_id);
             statement.setString(2, nickname);
             statement.setString(3, avatar_hash);
+            statement.setString(4, username);
+            statement.setInt(5, discriminator);
 
             execute(statement);
         }catch(SQLException e){

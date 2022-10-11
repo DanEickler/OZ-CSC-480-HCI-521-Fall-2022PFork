@@ -68,6 +68,7 @@ public class Update {
 
     /**
      * Updates the author's avatar hash to the provided value.
+     *
      * @param discord_id the author's discord ID
      * @param avatar_hash the hash code of the avatar for the author.
      */
@@ -91,7 +92,56 @@ public class Update {
     }
 
     /**
+     * Updates the author's username
+     *
+     * @param discord_id the author's discord id
+     * @param username the author's username
+     */
+    public void username(long discord_id, String username) {
+        //trim if necessary
+        if (username.length() > Database.USERNAME_LIMIT) username =
+                username.trim().substring(0, Database.USERNAME_LIMIT);
+
+        try(PreparedStatement statement = connection.prepareStatement(
+                "UPDATE authors\n" +
+                        "\t\t\tSET username = ?\n" +
+                        "\t\t\tWHERE discord_id = ?"
+        )) {
+            statement.setString(1, username);
+            statement.setLong(2, discord_id);
+
+            execute(statement);
+        }catch(SQLException e){
+            System.out.println(e.getMessage());
+        }
+    }
+
+    /**
+     * Updates the author's discriminator
+     *
+     * @param discord_id the author's discord id
+     * @param discriminator the author's discriminator
+     */
+    public void discriminator(long discord_id, int discriminator) {
+        //trim if necessary
+
+        try(PreparedStatement statement = connection.prepareStatement(
+                "UPDATE authors\n" +
+                        "\t\t\tSET discriminator = ?\n" +
+                        "\t\t\tWHERE discord_id = ?"
+        )) {
+            statement.setInt(1, discriminator);
+            statement.setLong(2, discord_id);
+
+            execute(statement);
+        }catch(SQLException e){
+            System.out.println(e.getMessage());
+        }
+    }
+
+    /**
      * Sets the author's avatar hash to null
+     *
      * @param discord_id The Discord ID of the author
      */
     public void avatarHashToNull(long discord_id) {

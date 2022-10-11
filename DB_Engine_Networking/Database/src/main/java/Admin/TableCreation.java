@@ -112,6 +112,8 @@ public class TableCreation {
                     "    `discord_id` BIGINT  NOT NULL ,\n" +
                     "    `author_nickname` varchar(32)  NOT NULL ,\n" +
                     "    `avatar_hash` varchar(32) NULL ,\n" +
+                    "    `username` varchar(32) NOT NULL ,\n" +
+                    "    `discriminator` SMALLINT NOT NULL ,\n" +
                     "    PRIMARY KEY (\n" +
                     "        `discord_id`\n" +
                     "    )\n" +
